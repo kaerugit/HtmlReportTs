@@ -6,7 +6,7 @@ jsonデータをhtmlテンプレートの内容にあわせて帳票用に加工
 ヘッダー・フッターなどを再表示機能を簡易的に実行出来ます  
 
 ## オンラインサンプル（online sample）  
-https://kaerugit.github.io/HtmlReportTs  
+https://kaerugit.github.io/HtmlReportTs/dist/  
 
 ## 使用方法
 ***    
@@ -113,9 +113,9 @@ formatdelimiter の場所参照(javascriptも同じもの参照)
 
 レポートの生成は javascript で以下実行  
 ***
-const rpt = new window.DoraReport.Report(); 
-rpt.Data = {x:"aa"}     //jsonData 
-rpt.run();   
+const rpt = new window.DoraReport.Report();  
+rpt.Data = {x:"aa"};     //jsonData  
+rpt.run(); 
 ***
 
 ##  Reportクラス(全体)
@@ -127,22 +127,23 @@ jsonデータ
  余白用のCSS(string)  
 
 #### Section
-└Page: ReportPageSectionSetting(後述) 
-└Detail: ReportDetailSectionSetting(後述) 
-└Group1～9: ReportGroupSectionSetting(後述) 
-※reporttype以外は全てjavascriptでの記述が可能 
+└Page: ReportPageSectionSetting(後述)  
+└Detail: ReportDetailSectionSetting(後述)  
+└Group1～9: ReportGroupSectionSetting(後述)  
+  
+※reporttype以外は全てjavascriptでの記述が可能  
 
 ### イベント
-####　ReportEndFunction
+#### ReportEndFunction
 作成後に呼び出されるfunction(普通のhtmlが作成されるので、必要であればゴリゴリすることも可) 
 
 ## ReportPageSectionSetting
 
 ### イベント
 #### FormatEventFunction   
-FormatEventFunction: ((isHeader: boolean, ele: HTMLElement,data:any) 
-ヘッダーの場合はisHeader=true 
-※sample(eventtest.html参照) 
+FormatEventFunction: (isHeader: boolean, ele: HTMLElement,data:any)  
+ヘッダーの場合はisHeader=true  
+※sample(eventtest.html参照)  
 **※注意：footerについては高さが変更になるエレメントの操作はしないでください**
 
 ## ReportDetailSectionSetting
@@ -159,16 +160,16 @@ falseの場合、各sectionにtabletagを配置(各sectionと結合しない)
 
 ### イベント
 #### FormatEventFunction    
-FormatEventFunction: ((isBlank: boolean, ele: HTMLElement,data:any)
-空白行の場合（DetailRepeatCountプロパティ使用時）はisBlank=true
+FormatEventFunction: (isBlank: boolean, ele: HTMLElement,data:any)  
+空白行の場合（DetailRepeatCountプロパティ使用時）はisBlank=true  
 ※sample(eventtest.html参照)  
 
 ## ReportGroupSectionSetting
+### プロパティ
 
 #### IsMergeTable (boolean)  
 falseの場合、各sectionにtabletagを配置(各sectionと結合しない)  
 
-### プロパティ
 #### BindField (string)  
 連結するfield(GroupBindfield)  
 
@@ -184,10 +185,9 @@ BindField プロパティ変更時に改ページ（複数は不可）
 
 ### イベント
 #### FormatEventFunction    
-FormatEventFunction: ((isHeader: boolean, ele: HTMLElement,data:any)
-ヘッダーの場合はisHeader=true
+FormatEventFunction: (isHeader: boolean, ele: HTMLElement,data:any)  
+ヘッダーの場合はisHeader=true  
 ※sample(eventtest.html参照)  
-**※注意：footerについては高さが変更になるエレメントの操作はしないでください**
 
 
 ## ヘッダー、フッターの合計計算について
