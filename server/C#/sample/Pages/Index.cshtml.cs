@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace sample.Pages
 
         }
 
-        
+
         public async Task<ActionResult> OnPostNomalAsync()
         {
 
@@ -94,13 +95,37 @@ namespace sample.Pages
         {
             var data = GetData();
 
-            return await CreaetePdf("merge.html", data);
+            //無理やりiframeを通じて作成しているが別々のpdfで出力して連結したほうがわかりやすいかも・・
+
+            //div#divDummyが表示（追加）されるまで待つ
+            return await CreaetePdf("merge.html", data, "div#divDummy");
+        }
+
+        public ActionResult OnPostFuka()
+        {
+            var data = GetData();
+
+            var ret = new ConcurrentBag<ActionResult>();
+
+            //各サーバのスペックで上限値は変わってくると思います（開発環境メモリ16Mでテスト）
+            Parallel.For(0, 15,
+                (i) =>
+                {
+                    var pdf = CreaetePdf("nomal.html", new List<JObject>{ data[i]});
+                    ret.Add(pdf.Result);
+
+                }
+            );
+            
+            return ret.First();
         }
 
 
-
-
-        private List<JObject> GetData() 
+        /// <summary>
+        /// テストデータ作成（どうでもよいモジュール）
+        /// </summary>
+        /// <returns></returns>
+        private List<JObject> GetData()
         {
 
             var url = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}/data/personal.json";
@@ -123,17 +148,43 @@ namespace sample.Pages
 
             var jsonData = JsonConvert.DeserializeObject<List<JObject>>(data);
 
-            jsonData = jsonData.OrderBy((e) => e["都道府県CD"]).ThenBy((e) => e["性別"]).ToList();
+            jsonData = jsonData.OrderBy((e) => e["都道府県CD"]).ThenByDescending((e) => e["性別"]).ToList();
 
-            for (var i=0;i< jsonData.Count-1; i++)
+            var mainItems = new List<JObject>();
+
+            var kendatacount = 1;
+            var sexdatacount = 1;
+
+            for (var i = 0; i < jsonData.Count - 1; i++)
             {
                 jsonData[i]["連番"] = (i + 1);
+
+                if (i != 0)
+                {
+                    if (jsonData[i - 1]["都道府県CD"].ToString() != jsonData[i]["都道府県CD"].ToString())
+                    {
+                        kendatacount = 1;
+                        sexdatacount = 1;
+                    }
+                    else if (jsonData[i - 1]["性別"].ToString() != jsonData[i]["性別"].ToString())
+                    {
+                        sexdatacount = 1;
+                    }
+                }
+                //データは先に作成しておく
+                jsonData[i]["datacount"] = kendatacount;
+                jsonData[i]["sexdatacount"] = sexdatacount;
+                kendatacount++;
+                sexdatacount++;
+
+                mainItems.Add(jsonData[i]);
+
             }
 
-            return jsonData;
+            return mainItems;
         }
 
-        private async Task<ActionResult> CreaetePdf(string url, List<JObject> data)
+        private async Task<ActionResult> CreaetePdf(string url, List<JObject> data,  string waitTag="")
         {
             //好みで変更
             var baseUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}";
@@ -142,35 +193,41 @@ namespace sample.Pages
             //最初は関連ファイルをダウンロードするので遅い
             await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
 
-            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            using (var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true
-            });
-
-            //browser.pdf
-
-            var page = await browser.NewPageAsync();
-
-            //移動(読込終了まで待つ)
-            await page.GoToAsync(baseUrl, new NavigationOptions() { WaitUntil = new[] { WaitUntilNavigation.DOMContentLoaded } });
-
-            //任意のjavascriptを実行(runReportは固定のhtmlに記述)
-            await page.AddScriptTagAsync(
-                new AddTagOptions()
+            }))
+            {
+                using (var page = await browser.NewPageAsync())
                 {
-                    Content = $@"runReport({JsonConvert.SerializeObject(data)});"
-                });
 
-            //await page.WaitForSelectorAsync("div.ctr-p");
+                    //移動(読込終了まで待つ)
+                    await page.GoToAsync(baseUrl, new NavigationOptions() { WaitUntil = new[] { WaitUntilNavigation.DOMContentLoaded } });
 
-            var pdfOptions = new PdfOptions();
-            //背景を印刷する場合：true
-            pdfOptions.PrintBackground = true;
+                    //任意のjavascriptを実行(runReportは固定のhtmlに記述)
+                    await page.AddScriptTagAsync(
+                        new AddTagOptions()
+                        {
+                            Content = $@"runReport({JsonConvert.SerializeObject(data)});"
+                        });
 
-            var file = await page.PdfStreamAsync(pdfOptions);
+                    //await page.WaitForSelectorAsync("[name='divDummy']");
+                    //こちらのタグが表示されるまで待つ
+                    if (waitTag.Length > 0)
+                    {
+                        await page.WaitForSelectorAsync(waitTag);
+                    }
+                    
 
-            return File(file, "application/pdf", url.Substring(0,url.IndexOf(".")) + ".pdf");
+                    var pdfOptions = new PdfOptions();
+                    //背景を印刷する場合：true
+                    pdfOptions.PrintBackground = true;
 
+                    var file = await page.PdfStreamAsync(pdfOptions);
+
+                    return File(file, "application/pdf", url.Substring(0, url.IndexOf(".")) + ".pdf");
+                };
+            };
         }
 
     }

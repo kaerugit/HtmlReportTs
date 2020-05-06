@@ -207,8 +207,6 @@ FormatEventFunction: (isHeader: boolean, ele: HTMLElement,data:any)
 ***  
 
 ・fontがクライアントに依存するので注意が必要（フォントを固定したい場合はwebfont利用することをおすすめ）  
-・用紙のフォーマット(紙に線などが印字済み)が決まっている場合は、ブラウザの解釈によって違うので市販のレポートの使用をおすすめ  
-
 
 ## 本体のコンパイル方法(TypeScript)
  
@@ -219,6 +217,16 @@ npm run watch　デバッグ
  
 ※作成されるJavaScript dist\javascript\ 
  
+## Server側で作成するサンプル(簡易帳票システムサンプル)
+
+\server 内にPuppeteer(https://github.com/hardkoded/puppeteer-sharp)でPDFを作成するサンプル  
+(最初の実行は遅いので注意)  
+各種ボタンクリックで帳票のダウンロードが可能  
+開発時にはhtmlを変更を変更してリロードで(疑似)ホットリロードしながら開発が可能  
+本番はサーバ側でデータを差し込んでPDF作成  
+(サーバ側から JavaScript runReportを呼び出しして作成)  
+といったことが可能  
+
 ## 最後に
 普通に市販ソフトのActiveReports等の利用したほうがよいですが  
 ちょっと簡単にReportを作成したい場合には使えるかも・・  

@@ -33,6 +33,17 @@
 </html>
 
 <script>
+    //Headless Chrome(Puppeteer)の時は無視　⇒普通にhtmlを開くと実行される（開発時）　本番はバックエンドから値をセット
+    let isAutomated = !!(typeof navigator !== 'undefined' && navigator.webdriver);
+    
+    if (isAutomated == false) {
+        window.addEventListener('DOMContentLoaded',
+            function () {
+                MergeReport();
+            }
+        );
+    }
+
     
     function MergeReport() {
 
@@ -100,7 +111,44 @@
         body.removeChild(document.getElementById('if2'));
 
         body.style.visibility = "visible";
+
+        //終了後ダミーのエレメントを作って処理終了を伝達（サーバ処理との連携）
+        let divDummy = document.createElement("div");
+
+        divDummy.setAttribute("id", "divDummy");
+        //divDummy.setAttribute("name", "divDummy");
+        divDummy.style.visibility = "hidden";
+        body.appendChild(divDummy);
     }
 
-    MergeReport();
+    //外部から実行
+    async function runReport(mainItems) {
+        const if1 = document.getElementById('if1').contentWindow.document;
+        const if2 = document.getElementById('if2').contentWindow.document;
+
+        for (; ;) {
+            if (if1.readyState == 'complete') {
+                break;
+            }
+            await timeout(1000);
+        }
+        //iflameのfunctionを実行
+        document.getElementById('if1').contentWindow.runReport(mainItems);
+
+        for (; ;) {
+            if (if2.readyState == 'complete') {
+                break;
+            }
+            await timeout(1000);
+        }
+        //iflameのfunctionを実行
+        document.getElementById('if2').contentWindow.runReport(mainItems);
+        
+        MergeReport();
+    }
+
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
 </script>
