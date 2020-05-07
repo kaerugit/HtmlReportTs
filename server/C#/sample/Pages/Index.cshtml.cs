@@ -107,7 +107,7 @@ namespace sample.Pages
 
             var ret = new ConcurrentBag<ActionResult>();
 
-            //各サーバのスペックで上限値は変わってくると思います（開発環境メモリ16Mでテスト）
+            //各サーバのスペックで上限値は変わってくると思います（開発環境メモリ16gbでテスト）
             Parallel.For(0, 15,
                 (i) =>
                 {
@@ -117,6 +117,7 @@ namespace sample.Pages
                 }
             );
             
+            //とりあえずどれか戻す
             return ret.First();
         }
 
