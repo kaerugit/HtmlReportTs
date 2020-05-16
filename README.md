@@ -226,6 +226,7 @@ npm run watch　デバッグ
 本番はサーバ側でデータを差し込んでPDF作成  
 (サーバ側から JavaScript runReport Functionを呼び出し)  
 といったことが可能  
+※サンプル内の帳票(\sampleフォルダ)は全て同じファイルです  
 
 ## 最後に
 普通に市販ソフトのActiveReports等の利用したほうがよいですが  

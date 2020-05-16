@@ -1,0 +1,29 @@
+{
+  "name": "HtmlReportNode",
+  "version": "1.0.0",
+  "description": "update\r $ npm update",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode=production --devtool=false&&node_modules\\.bin\\tsc.cmd -p tsconfig.json",
+    "watch": "webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "express": "^4.17.1",
+    "puppeteer": "^3.0.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.1",
+    "@types/puppeteer": "^2.1.0",
+    "@types/webpack": "^4.41.13",
+    "nodemon": "^2.0.4",
+    "ts-loader": "^7.0.4",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2",
+    "webpack": "^4.43.0"
+  }
+}

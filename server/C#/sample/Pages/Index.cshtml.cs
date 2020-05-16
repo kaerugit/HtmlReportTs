@@ -123,7 +123,7 @@ namespace sample.Pages
 
 
         /// <summary>
-        /// テストデータ作成（どうでもよいモジュール）
+        /// テストデータ作成（どうでもよいモジュール） ※適当なのでマネしないでください（笑）
         /// </summary>
         /// <returns></returns>
         private List<JObject> GetData()
@@ -155,10 +155,24 @@ namespace sample.Pages
 
             var kendatacount = 1;
             var sexdatacount = 1;
+            decimal sumKingaku = 0;
+            Random rnd = new Random();
 
             for (var i = 0; i < jsonData.Count - 1; i++)
             {
                 jsonData[i]["連番"] = (i + 1);
+
+                jsonData[i]["日付"] = "2018/01/" + (Math.Floor((decimal)rnd.Next(0, 20)) + 1).ToString();
+
+                var  random = (int)Math.Floor((decimal)rnd.Next(0,3));   //0-2の乱数
+                jsonData[i]["品番"] = (new List<string> { "MANJ", "OKASHI", "TUKEMONO"})[random];
+
+                jsonData[i]["品名"] = jsonData[i]["都道府県"] + (new List<string> { "まんじゅう", "おかし", "漬物" })[random];
+
+                jsonData[i]["数量"] = Math.Floor((decimal)rnd.Next(0, 5)) + 1;
+                jsonData[i]["単価"] = (new List<int> { 1000, 500, 800 })[random];
+
+                jsonData[i]["金額"] = ((decimal)(jsonData[i]["数量"])) * ((decimal)(jsonData[i]["単価"]));
 
                 if (i != 0)
                 {
@@ -166,6 +180,7 @@ namespace sample.Pages
                     {
                         kendatacount = 1;
                         sexdatacount = 1;
+                        sumKingaku = 0;
                     }
                     else if (jsonData[i - 1]["性別"].ToString() != jsonData[i]["性別"].ToString())
                     {
@@ -177,6 +192,11 @@ namespace sample.Pages
                 jsonData[i]["sexdatacount"] = sexdatacount;
                 kendatacount++;
                 sexdatacount++;
+
+                //合計金額の計算
+                sumKingaku += ((decimal)(jsonData[i]["金額"]));
+                jsonData[i]["合計金額"] = sumKingaku;
+
 
                 mainItems.Add(jsonData[i]);
 
