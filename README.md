@@ -219,13 +219,14 @@ npm run watch　デバッグ
  
 ## Server側で作成するサンプル(簡易帳票システムサンプル)
 
-\server 内にPuppeteer(https://github.com/hardkoded/puppeteer-sharp)でPDFを作成するサンプル  
+\server 内にPuppeteer( https://github.com/hardkoded/puppeteer-sharp )でPDFを作成するサンプル(C#)  
 (最初の実行はHeadless Chromeのダウンロードが発生して遅いので注意)  
 各種ボタンクリックで帳票のダウンロードが可能  
 開発時にはhtmlを変更を変更してリロードで(疑似)ホットリロードしながら開発が可能  
 本番はサーバ側でデータを差し込んでPDF作成  
 (サーバ側から JavaScript runReport Functionを呼び出し)  
 といったことが可能  
+Node.js版のサンプルも追加(2020/05)  
 ※サンプル内の帳票(\sampleフォルダ)は全て同じファイルです  
 
 ## 最後に
